@@ -6,7 +6,8 @@
 #include <iterator>
 #include <string>
 #include <queue>
-
+#include <set>
+#include <string>
 
 
 //##############################TASK_1##############################
@@ -20,27 +21,6 @@ void printWords(W it, W end)
 }
 
 
-//##############################TASK_2##############################
-
-std::string getSentence(std::string& s)
-{
-    std::string punctuationMarks{ ".?!" };                               // разделительные знаки пунктуации
-    std::string temp;                                                     // найденное предложение из введенных данных
-
-    for (const char& c : s)                                               // посимвольно перебираем поток данных
-    {
-        temp.push_back(c);                                                // добавляем каждый символ в потенциальное найденное предложение
-
-        if (punctuationMarks.find(c) != std::string::npos)                // если найден разделительный знак пунктуации - заканчиваем поиск
-        {
-            s.erase(0, temp.size());                                      // удаляем найденное предложение из потока данных
-            if (temp[0] == ' ') { temp.erase(0, 1); }                     // обрезаем пробел в начале предложения, если он есть
-            return temp;                                                  // возвращаем найденное предложение
-        }
-    }
-
-    return {};                                                            // иначе возвращаем пустой объект
-}
 
 int main()
 {
@@ -57,10 +37,28 @@ int main()
     std::list<std::string> l(v.begin(), v.end());
     std::cout << "\nResult list:" << std::endl;
     printWords(l.begin(), l.end());
-
+ 
     std::cout << "\n\n##############################TASK_2##############################\n\n";
 
-   
+    const auto my_string_compare = [](const std::string& lhs, const std::string& rhs) {
+        return lhs.size() < rhs.size();
+    };
+
+    std::set<std::string, decltype(my_string_compare) > sentences(my_string_compare);
+    std::string sent("not empty");
+    while (getline(std::cin, sent) && !sent.empty()) {
+        std::cout << std::endl;
+        typename std::string::size_type pos_start{}, pos_end{};
+        while (pos_start != sent.npos && pos_end != sent.npos) {
+            pos_end = sent.find_first_of(".!?", pos_start);
+            sentences.insert(sent.substr(pos_start, pos_end - pos_start));
+            pos_start = sent.find_first_not_of(" .!?", pos_end);
+        }
+    }
+    sentences.erase(std::string());
+    for (auto& str : sentences) {
+        std::cout << str << ";\n" << std::endl;
+    }
 
 
 
